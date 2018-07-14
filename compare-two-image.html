@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {box-sizing: border-box;}
+.img-comp-container {
+  position: relative;
+  height: 200px;
+}
+.img-comp-img {
+  position: absolute;
+  width: auto;
+  height: auto;
+  overflow:hidden;
+}
+.img-comp-img img {
+  display:block;
+  vertical-align:middle;
+}
+.img-comp-slider {
+  position: absolute;
+  z-index:9;
+  cursor: ew-resize;
+  /*set appearance:*/
+  width: 40px;
+  height: 40px;
+  background-color: #2196F3;
+  opacity: 0.7;
+  border-radius: 50%;
+}
+</style>
+<script>
+function initComparisons() {
+  var x, i;
+  /*find all elements*/
+  x = document.getElementsByClassName("img-comp-overlay");
+  for (i = 0; i < x.length; i++) {
+    /*overlay element*/
+    compareImages(x[i]);
+  }
+  function compareImages(img) {
+    var slider, img, clicked = 0, w, h;
+    /*width and height*/
+    w = img.offsetWidth;
+    h = img.offsetHeight;
+    /*width img 50%:*/
+    img.style.width = (w / 2) + "px";
+    /*create slider:*/
+    slider = document.createElement("DIV");
+    slider.setAttribute("class", "img-comp-slider");
+    /*insert slider*/
+    img.parentElement.insertBefore(slider, img);
+    /*position the slider*/
+    slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
+    slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+    /*execute a functio*/
+    slider.addEventListener("mousedown", slideReady);
+    /*another function*/
+    window.addEventListener("mouseup", slideFinish);
+    /*touch screens*/
+    slider.addEventListener("touchstart", slideReady);
+    /*released*/
+    window.addEventListener("touchstop", slideFinish);
+    function slideReady(e) {
+      /*moving image:*/
+      e.preventDefault();
+      /*slider clicked*/
+      clicked = 1;
+      /*slider moved:*/
+      window.addEventListener("mousemove", slideMove);
+      window.addEventListener("touchmove", slideMove);
+    }
+    function slideFinish() {
+      /*slider is no longer*/
+      clicked = 0;
+    }
+    function slideMove(e) {
+      var pos;
+      /*exit this function:*/
+      if (clicked == 0) return false;
+      /*get the cursor's x position:*/
+      pos = getCursorPos(e)
+      /*outside the image:*/
+      if (pos < 0) pos = 0;
+      if (pos > w) pos = w;
+      /*resize*/
+      slide(pos);
+    }
+    function getCursorPos(e) {
+      var a, x = 0;
+      e = e || window.event;
+      /*get the x positions of the image:*/
+      a = img.getBoundingClientRect();
+      /*calculate the cursor's x coordinate*/
+      x = e.pageX - a.left;
+      /*scrolling:*/
+      x = x - window.pageXOffset;
+      return x;
+    }
+    function slide(x) {
+      /*resize the image:*/
+      img.style.width = x + "px";
+      /*position the slider:*/
+      slider.style.left = img.offsetWidth - (slider.offsetWidth / 2) + "px";
+    }
+  }
+}
+</script>
+</head>
+<body>
+
+<h1>Compare Two Images</h1>
+
+<p>Klik dan geser image untuk melihat efek</p>
+
+<div class="img-comp-container">
+  <div class="img-comp-img">
+    <img src="1.jpg" width="300" height="200">
+  </div>
+  <div class="img-comp-img img-comp-overlay">
+    <img src="2.jpg" width="300" height="200">
+  </div>
+</div>
+
+<script>
+/*Execute*/
+initComparisons();
+</script>
+
+</body>
+</html>
